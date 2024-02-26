@@ -1,0 +1,74 @@
+﻿@using ProductCatalog.Domain.Entity;
+@using ProductCatalog.Models;
+@model IList<ProductCategory>;
+@{
+    ViewData["Title"] = "Home Page";
+
+}
+
+<div class="text-center" style="margin-bottom:20px;">
+    <h1 class="display-4">Product Catalog Pages</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <a
+@*         asp-controller="CategoryController"
+       asp-action="Create" *@
+       type="button"
+       class="btn btn-primary"
+       data-bs-toggle="modal"
+       /data-bs-target="#createCategoryModal"
+       style="margin-bottom:20px;">
+        Add New Product
+    </a>
+</div>
+
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+    <div class="col-sm-4" style="margin-bottom:20px;">
+        <div class="mp-card card text-center">
+            <div class="card-body">
+                <h5 class="card-title">@item.Product</h5>
+                <p class="card-text">Раздел содержит страницы продукта @item.Product.</p>
+                <a 
+                    href="CategoryDetail/Details/@item.Id" 
+                    class="btn btn-primary"
+                >
+                    Detail
+                </a>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+
+<!-- Create Category Modal -->
+<div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create new product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="CategoryDetail"
+                      asp-action="CreateCategory"
+                      method="post">
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>Product: </b></span>
+                        <input type="text"
+                               class="form-control"
+                               name="Product"
+                        />
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input required type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Create ?</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

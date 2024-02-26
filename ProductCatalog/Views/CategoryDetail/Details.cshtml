@@ -1,0 +1,339 @@
+﻿@using ProductCatalog.Domain.Entity
+@model ProductCategory;
+@{
+    ViewData["Title"] = Model.Product;
+}
+
+<div class="text-center">
+    <h1 class="display-4">@Model.Product</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <a asp-controller="CategoryDetail"
+       asp-action="CreateGroup"
+       type="button"
+       class="btn btn-primary"
+       data-bs-toggle="modal"
+       data-bs-target="#createGroupModal"
+       style="margin-bottom:20px;">
+        Add New Product Group
+    </a>
+    <a 
+        asp-controller="CategoryDetail"
+        asp-action="Create"
+        type="button" 
+        class="btn btn-primary" 
+        data-bs-toggle="modal" 
+        data-bs-target="#createModal"
+        style="margin-bottom:20px;"
+    >
+        Add New Product Page
+    </a>
+</div>
+
+<table class="table table-striped table-dark">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Url</th>
+            <th scope="col">Product</th>
+            <th scope="col">ProductGroup</th>
+            <th scope="col">Ecom</th>
+            <th scope="col">ContentType</th>
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    @foreach (var productGroup in Model.ProductGroup)
+    {
+        @foreach (var productPage in productGroup.ProductPages)
+        {
+        <tbody>
+            <tr>
+                <td>@productPage.Id</td>
+                <td>@productPage.Url</td>
+                <td>@Model.Product</td>
+                <td>@productGroup.Name</td>
+                <td>@productPage.Ecom</td>
+                <td>
+                    @productPage.ContentType
+                </td>
+                <td>
+                    <button id="edt"
+                        type="button" 
+                        class="btn btn-primary"
+                            data=@productPage.Id
+                            data-bs-toggle="modal"
+                            data-bs-target="#editModal"
+                                onclick="EditItem({
+                                id : @productPage.Id,
+                                url: '@productPage.Url',
+                                ecom: '@productPage.Ecom',
+                                contentType: '@productPage.ContentType',
+                                productGroup: { 
+                                                id: '@productGroup.Id',
+                                                name:'@productGroup.Name'
+                                }
+                               
+                            })">
+                        Edit
+                    </button>
+                    <button id="del"
+                            onclick="CacheID({
+                                id : @productPage.Id,
+                                url: '@productPage.Url',
+                                productGroup: '@productGroup.Name',
+                                product: '@Model.Product'
+                            })"
+                            type="button"
+                            class="btn-close btn-close-white"
+                            data=@productPage.Id
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            style="color:red;">
+                            
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+        }
+    }
+</table>
+
+
+<!-- Create Group Modal -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create new product group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="CategoryDetail"
+                      asp-action="CreateGroup"
+                      method="post">
+                    <div class="mb-3">
+                        <input name="ProductCategoryId" value="@Model.Id" style="display:none;" />
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>Product group: </b></span>
+                        <input type="text"
+                               class="form-control"
+                               name="Name"
+                               id="exampleInputEmail1"
+                               aria-describedby="emailHelp"
+                               id="product_page_product_group">
+                        </input>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input required type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Create ?</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Page Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create new product page</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form 
+                    asp-controller="CategoryDetail"
+                    asp-action="Create"
+                    method="post"
+                >
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>Product Group: </b></span>
+                        <select class="form-select" name="ProductGroupId">
+                            <option selected>Open this select menu</option>
+                            @foreach (var productGroup in Model.ProductGroup)
+                            {
+                                <option value=@productGroup.Id>@productGroup.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>URL: </b></span>
+                        <input type="text"
+                                class="form-control"
+                                name="Url"
+                                id="exampleInputEmail1"
+                                aria-describedby="emailHelp"
+                                id="product_page_product_group">
+                        </input>
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                    <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>ECOM: </b></span>
+                        <select class="form-select" aria-label="Default select example" name="Ecom">
+                            <option selected>Open this select menu</option>
+                            <option>yes</option>
+                            <option>no</option>
+                        </select>
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>Content type: </b></span>
+                        <select class="form-select" aria-label="Default select example" name="ContentType">
+                            <option selected>Open this select menu</option>
+                            <option>sale</option>
+                            <option>info</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input required type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Create ?</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Page Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create new product page</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="CategoryDetail"
+                      asp-action="EditProductPage"
+                      method="post">
+                    <div class="input-group input-group-sm mb-3">
+                        <input value="" name="Id" id="editPageId" style="display:none;"></input>
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>Product Group: </b></span>
+                        <select class="form-select" name="ProductGroupId" id="editProductGroup">
+                            <option selected>Open this select menu</option>
+                            @foreach (var productGroup in Model.ProductGroup)
+                            {
+                                <option value=@productGroup.Id>@productGroup.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>URL: </b></span>
+                        <input type="text"
+                               class="form-control"
+                               name="Url"
+                               id="editUrl"
+                               aria-describedby="emailHelp"
+                               value="">
+                        </input>
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>ECOM: </b></span>
+                        <select class="form-select" aria-label="Default select example" name="Ecom" id="editEcom">
+                            <option selected>Open this select menu</option>
+                            <option>yes</option>
+                            <option>no</option>
+                        </select>
+                    </div>
+                    <div class="input-group input-group-sm mb-3">
+                        <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>Content type: </b></span>
+                        <select class="form-select" aria-label="Default select example" name="ContentType" id="editContentType">
+                            <option selected>Open this select menu</option>
+                            <option>sale</option>
+                            <option>info</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input required type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Edit ?</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Page Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete product page</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="CategoryDetail"
+                      asp-action="Delete"
+                      method="post"
+                >
+                    <div class="mb-3">
+                        <input id="product_page_id" value="" name="PageId" style="display:none">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>Product: </b></span>
+                            <span
+                                class="form-control"
+                                id="product_page_product"
+                            >
+                            </span>
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            
+                            <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>Product Group: </b></span>
+                            <span class="form-control"
+                                  id="product_page_product_group">
+                            </span>
+                        </div>
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-sm" style="width:120px;"><b>URL: </b></span>
+                            <span class="form-control"
+                                  id="product_page_url">
+                            </span>
+                        </div>
+                        
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input required type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Delete ?</label>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function CacheID(item) {
+        let productPageId = document.getElementById('product_page_id')
+        let productPageProduct = document.getElementById('product_page_product')
+        let productPageProductGroup = document.getElementById('product_page_product_group')
+        let productPageUrl = document.getElementById('product_page_url')
+         
+        productPageId.value = item.id
+        productPageProduct.textContent = item.product
+
+        productPageProductGroup.textContent = item.productGroup
+        productPageUrl.textContent = item.url
+    }
+
+    function EditItem(item) {
+        let productPageId = document.getElementById('editPageId')
+        let productPrdouctGroup = document.getElementById('editProductGroup')
+        let productPageEcom = document.getElementById('editEcom')
+        let productContentType = document.getElementById('editContentType')
+        let productPageUrl = document.getElementById('editUrl')
+
+        productPageId.value = item.id
+        productPrdouctGroup.value = item.productGroup.id
+
+
+        productPageEcom.value = item.ecom
+        productContentType.value = item.contentType
+        productPageUrl.value = item.url
+        console.log(item.id)
+    }
+</script>
